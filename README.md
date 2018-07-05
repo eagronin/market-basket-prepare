@@ -30,7 +30,7 @@ summary(items)                # summary stats
 apply(is.na(items), 2, sum)   # missing values
 ```
 
-The summary statistics below show that the dataset has 541,909 samples and 14 features.  They also show several patterns in the data that need to be addressed further.  Specifically, there are items with negative quantities (returns), negative prices, in Panel A.  Futher, there are mismatches between StockCode and Description counts in Panel B, while the small magnitudes of mismatches in some instances (e.g., 2203 items for StockCode 22423 versus 2200 items for REGENCY CAKESTAND 3 TIER) and exact matches in other instances (e.g., 2159 items for StockCode 85099B versus the same number of items for JUMBO BAG RED RETROSPOT) suggest that StockCode and Description counts should match.
+The summary statistics below show that the dataset has 541,909 samples and 14 features.  They also show several patterns in the data that need to be addressed further.  Specifically, 135,080 CustomerIDs are missing, which is approximately 25% of the dataset.  Further, there are items with negative quantities (returns), negative prices, in Panel A.  Futher, there are mismatches between StockCode and Description counts in Panel B, while the small magnitudes of mismatches in some instances (e.g., 2203 items for StockCode 22423 versus 2200 items for REGENCY CAKESTAND 3 TIER) and exact matches in other instances (e.g., 2159 items for StockCode 85099B versus the same number of items for JUMBO BAG RED RETROSPOT) suggest that StockCode and Description counts should match.
 
 **Table 1**<br/>
 Panel A. Numerical Features
@@ -61,9 +61,9 @@ InvoiceNo | StockCode | Description | Country | ID
 
 Futher look at the data reveals that apart from the irregularities observed from the summary statistics table above, there are a number of missing or invalid descriptions, such as "?display?", "?missing", "??", "historic computer difference?....se", "POSSIBLE DAMAGES OR LOST?", etc. Also, the highest prices in the data appear against such Description fields as "AMAZON FEE", "Adjust bad debt", "POSTAGE", "DOTCOM POSTAGE", "Manual", i.e., desctiptions of various actions rather than names of items.  Finally, there are a number of cancellations that can be identified using letter "C" in the beginning of InvoiceNo.
 
-Invalid samples should be removed from the data before we run the algorithm to determine associations between customer purchases.  
+Invalid samples should be removed from the data before we run the algorithm to determine associations between customer purchases.  We will deal with these samples first and look into how to handle missing CustomerIDs after that.
 
-We will start from checking out mismatches between StockCode and Description.  Let's take a look, for example, at StockCode 22423, which has 2,203 instances versus 2,200 instances of "REGENCY CAKESTAND 3 TIER" (a difference of 3 instances).
+Let's check out mismatches between StockCode and Description.  Let's take a look, for example, at StockCode 22423, which has 2,203 instances versus 2,200 instances of "REGENCY CAKESTAND 3 TIER" (a difference of 3 instances).
 
 ```R
 temp = items[items$StockCode == 22423,]
