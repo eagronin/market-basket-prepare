@@ -34,7 +34,8 @@ The summary statistics below show that the dataset has 541,909 samples and 14 fe
 
 The summary statistics also show several patterns in the data that need to be addressed further.  Specifically, 135,080 CustomerIDs are missing, which is approximately 25% of the dataset.  Further, there are items with negative quantities (returns) and negative prices (see Panel A); mismatches between StockCode and Description counts (see Panel B), while the small magnitudes of mismatches in some instances (e.g., 2203 items for StockCode 22423 versus 2200 items for REGENCY CAKESTAND 3 TIER) and exact matches in other instances (e.g., 2159 items for StockCode 85099B versus the same number of items for JUMBO BAG RED RETROSPOT) suggest that StockCode and Description counts should match.
 
-**TABLE 1**<br/>
+**TABLE 1**
+
 Panel A. Numerical Features
 
 Feature Name|Min.|1st Qu.|Median|Mean|3rd Qu.|Max|Missing
