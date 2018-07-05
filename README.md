@@ -30,9 +30,11 @@ summary(items)                # summary stats
 apply(is.na(items), 2, sum)   # missing values
 ```
 
-The summary statistics below show that the dataset has 541,909 samples and 14 features.  They also show several patterns in the data that need to be addressed further.  Specifically, 135,080 CustomerIDs are missing, which is approximately 25% of the dataset.  Further, there are items with negative quantities (returns), negative prices, in Panel A.  Futher, there are mismatches between StockCode and Description counts in Panel B, while the small magnitudes of mismatches in some instances (e.g., 2203 items for StockCode 22423 versus 2200 items for REGENCY CAKESTAND 3 TIER) and exact matches in other instances (e.g., 2159 items for StockCode 85099B versus the same number of items for JUMBO BAG RED RETROSPOT) suggest that StockCode and Description counts should match.
+The summary statistics below show that the dataset has 541,909 samples and 14 features.  The customers reside predominantly in the UK, make approximately 50% of their purchases between 11:45am and 3:30pm (see HourMinute feature) and buy the median quantity of 3 units per item at the median price of 2.08 pounds per unit. We note and discuss further below that an invoice may include multiple items.
 
-**Table 1**<br/>
+The summary statistics also show several patterns in the data that need to be addressed further.  Specifically, 135,080 CustomerIDs are missing, which is approximately 25% of the dataset.  Further, there are items with negative quantities (returns) and negative prices (see Panel A); mismatches between StockCode and Description counts (see Panel B), while the small magnitudes of mismatches in some instances (e.g., 2203 items for StockCode 22423 versus 2200 items for REGENCY CAKESTAND 3 TIER) and exact matches in other instances (e.g., 2159 items for StockCode 85099B versus the same number of items for JUMBO BAG RED RETROSPOT) suggest that StockCode and Description counts should match.
+
+**TABLE 1**<br/>
 Panel A. Numerical Features
 
 Feature Name|Min.|1st Qu.|Median|Mean|3rd Qu.|Max|Missing
