@@ -32,7 +32,7 @@ apply(is.na(items), 2, sum)   # missing values
 
 The summary statistics below show that the dataset has 541,909 samples and 14 features.  They also show several patterns in the data that need to be addressed further.  Specifically, there are items with negative quantities (returns), negative prices, in Panel A.  Futher, there are mismatches between StockCode and Description counts in Panel B, while the small magnitudes of mismatches in some instances (e.g., 2203 items for StockCode 22423 versus 2200 items for REGENCY CAKESTAND 3 TIER) and exact matches in other instances (e.g., 2159 items for StockCode 85099B versus the same number of items for JUMBO BAG RED RETROSPOT) suggest that StockCode and Description counts should match.
 
-**Table 1**<br/>
+
 Panel A. Numerical Features
 
 Feature Name|Min.|1st Qu.|Median|Mean|3rd Qu.|Max|Missing
