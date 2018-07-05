@@ -31,7 +31,7 @@ apply(is.na(items), 2, sum)   # missing values
 
 The summary statistics below show that the dataset has 541,909 samples and 15 features.  They also show several patterns in the data that need to be addressed further.  Specifically, there are items with negative quantities (returns), negative prices, in Panel A.  Futher, there are mismatches between StockCode and Description counts in Panel B, while the small magnitudes of mismatches in some instances (e.g., 2203 items for StockCode 22423 versus 2200 items for REGENCY CAKESTAND 3 TIER) and exact matches in other instances (e.g., 2159 items for StockCode 85099B versus the same number of items for JUMBO BAG RED RETROSPOT) suggest that StockCode and Description counts should match.
 
-Panel A. Numerical Features
+**Panel A. Numerical Features**
 
 Feature Name|Min.|1st Qu.|Median|Mean|3rd Qu.|Max|Missing
 |:--- |:--- |:--- |:--- |:--- |:--- |:--- |:--- |
@@ -61,13 +61,26 @@ Futher look at the data reveals that apart from the irregularities observed from
 
 Invalid samples should be removed from the data before we run the algorithm to determine associations between customer purchases.  
 
-We will start from checking out mismatches between StockCode and Description.  Let's take a look, for example, at StockCode 22423, which has 3 mismatches with the description of "REGENCY CAKESTAND 3 TIER":
+We will start from checking out mismatches between StockCode and Description.  Let's take a look, for example, at StockCode 22423, which has 2,203 instances versus 2,200 instances of "REGENCY CAKESTAND 3 TIER" (a difference of 3 instances).
 
 ```R
 temp = items[items$StockCode == 22423,]
 unique(temp$Description)
 temp[temp$Description != "REGENCY CAKESTAND 3 TIER",]
 ```
+
+The code above generates the follwoing output:
+
+```R
+[1] REGENCY CAKESTAND 3 TIER faulty                   damages                 
+4224 Levels:   4 PURPLE FLOCK DINNER CANDLES  50'S CHRISTMAS GIFT BAG LARGE  DOLLY GIRL BEAKER  I LOVE LONDON MINI BACKPACK  I LOVE LONDON MINI RUCKSACK  NINE DRAWER OFFICE TIDY ... ZINC WIRE SWEETHEART LETTER TRAY
+
+       InvoiceNo StockCode Description Quantity   InvoiceDate UnitPrice CustomerID        Country       Date            DateTime Hour Minute HourMinute            ID AmountSpent
+21339     538072     22423      faulty      -13 12/9/10 14:10         0         NA United Kingdom 2010-12-09 2010-12-09 14:10:00   14     10   14.16667 NA 2010-12-09           0
+114429    546010     22423     damages      -19  3/8/11 15:55         0         NA United Kingdom 2011-03-08 2011-03-08 15:55:00   15     55   15.91667 NA 2011-03-08           0
+192292    553396     22423     damages      -21 5/16/11 16:48         0         NA United Kingdom 2011-05-16 2011-05-16 16:48:00   16     48   16.80000 NA 2011-05-16           0
+```
+
 
 same issue appears to affect StockCode 84879:
 
