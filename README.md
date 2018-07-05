@@ -49,12 +49,12 @@ Non-numerical / Categorical Features
 
 InvoiceNo | StockCode | Description | InvoiceDate | Country | ID
 |:--- |:--- |:--- |:--- |:--- |:--- |
-573585 :  1114 | 85123A :  2313 | WHITE HANGING HEART T-LIGHT HOLDER:  2369 | 10/31/2011  2:59:34 PM: 1114 | United Kingdom:495478 | Length:541909
-581219 :   749 | 22423  :  2203 | REGENCY CAKESTAND 3 TIER          :  2200 | 12/8/2011  9:40:29 AM: 749 | Germany       :  9495 | Class :character
-581492 :   731 | 85099B :  2159 | JUMBO BAG RED RETROSPOT           :  2159 | 12/9/2011  10:15:11 AM: 731 | France        :  8557 | Mode  :character
-580729 :   721 | 47566  :  1727 | PARTY BUNTING                     :  1727 | 12/5/2011  5:36:01 PM: 721 | EIRE          :  8196
-558475 :   705 | 20725  :  1639 | LUNCH BAG RED RETROSPOT           :  1638 | 6/29/2011  4:09:45 PM: 705 | Spain         :  2533	
-579777 :   687 | 84879  :  1502 | ASSORTED COLOUR BIRD ORNAMENT     :  1501 | 11/30/2011  3:24:27 PM: 687 | Netherlands   :  2371	
+573585 :  1114 | 85123A :  2313 | WHITE HANGING HEART T-LIGHT HOLDER: 2369 | 10/31/2011  2:59:34 PM: 1114 | United Kingdom: 495478 | Length: 541909
+581219:   749 | 22423:  2203 | REGENCY CAKESTAND 3 TIER: 2200 | 12/8/2011  9:40:29 AM: 749 | Germany: 9495 | Class :character
+581492:   731 | 85099B:  2159 | JUMBO BAG RED RETROSPOT: 2159 | 12/9/2011  10:15:11 AM: 731 | France: 8557 | Mode  :character
+580729:   721 | 47566:  1727 | PARTY BUNTING: 1727 | 12/5/2011  5:36:01 PM: 721 | EIRE:  8196
+558475:   705 | 20725:  1639 | LUNCH BAG RED RETROSPOT: 1638 | 6/29/2011  4:09:45 PM: 705 | Spain: 2533	
+579777:   687 | 84879:  1502 | ASSORTED COLOUR BIRD ORNAMENT: 1501 | 11/30/2011  3:24:27 PM: 687 | Netherlands: 2371	
 (Other): 537202 | (Other): 530366 | (Other): 530315 | (Other): 537202 | (Other):   15279	
 
 check out mismatches between StockCode and Description
