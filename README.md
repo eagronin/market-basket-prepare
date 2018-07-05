@@ -35,16 +35,16 @@ The summary statistics below show that the dataset has 541,909 samples and 14 fe
 **Panel A. Numerical Features**
 
 Feature Name|Min.|1st Qu.|Median|Mean|3rd Qu.|Max|Missing
-|:--- |:--- |:--- |:--- |:--- |:--- |:--- |:--- |
-Quantity | -80995 | 1 | 3 | 9.55 | 10 | 80995	
-UnitPrice | -11062.06 | 1.25 | 2.08 | 4.61 | 4.13 | 38970	
-CustomerID | 12346 | 13953 | 15152 | 15288 | 16791 | 18287 | 135080
+|:--- | ---:| ---:| ---:| ---:| ---:| ---:| ---:|
+Quantity | -80,995 | 1 | 3 | 9.55 | 10 | 80,995	
+UnitPrice | -11,062.06 | 1.25 | 2.08 | 4.61 | 4.13 | 38,970	
+CustomerID | 12,346 | 13,953 | 15,152 | 15,288 | 16,791 | 18,287 | 135,080
 Date | 12/1/10 | 3/28/11 | 7/19/11 | 7/4/11 | 10/19/11 | 12/9/11	
 DateTime | 12/1/10 8:26 | 3/28/11 11:34 | 7/19/11 17:17 | 7/4/11 13:59 | 10/19/11 11:27 | 12/9/11 12:50	
 Hour | 6 | 11 | 13 | 13.08 | 15 | 20	
 Minute | 0 | 16 | 30 | 30.01 | 44 | 59	
 HourMinute | 6.167 | 11.783 | 13.583 | 13.579 | 15.483 | 20.633	
-AmountSpent | -168469.6 | 3.4 | 9.75 | 17.99 | 17.4 | 168469.6	
+AmountSpent | -168,469.6 | 3.4 | 9.75 | 17.99 | 17.4 | 168,469.6	
 
 **Panel B. Non-numerical / Categorical Features**
 
@@ -217,6 +217,10 @@ The number of observations remains at `527944`, which means that all the cancell
 
 Let's output summary statistics again using `summary(items)`:
 
+**Table 2**
+
+**Panel A. Numerical Features**
+
 Feature Name	 | 	Min	 | 	1st Qu.	 | 	Median	 | 	Mean	 | 	3rd Qu.	 | 	Max	 | 	Missing
 :---	 | 	---:	 | 	---:	 | 	---:	 | 	---:	 | 	---:	 | 	---:	 | 	---:
 Quantity	 | 	1	 | 	1	 | 	3	 | 	10.56	 | 	11	 | 	80995	 | 	
@@ -229,9 +233,17 @@ Minute	 | 	0	 | 	16	 | 	30	 | 	30.02	 | 	44	 | 	59	 |
 HourMinute	 | 	6.333	 | 	11.783	 | 	13.583	 | 	13.577	 | 	15.483	 | 	20.3	 | 	
 AmountSpent	 | 	0	 | 	3.75	 | 	9.9	 | 	19.47	 | 	17.46	 | 	168469.6	 | 	
 
+**Panel B. Non-numerical / Categorical Features**
 
-
-
+InvoiceNo	 | 	StockCode	 | 	Description	 | 	Country	 | 	ID
+:---	 | 	:---	 | 	:---	 | 	:---	 | 	:---
+573585  :  1113	 | 	85123A  :  2332	 | 	WHITE HANGING HEART T-LIGHT HOLDER  :  2323	 | 	United Kingdom:484079	 | 	Length. :  527944
+581219  :   748	 | 	85099B  :  2112	 | 	JUMBO BAG RED RETROSPOT  :  2112	 | 	Germany  :  8658	 | 	Class  :  character
+581492  :   730	 | 	22423  :  2017	 | 	REGENCY CAKESTAND 3 TIER   :  2017	 | 	France  :  8102	 | 	Mode  :  character
+580729  :   720	 | 	47566  :  1706	 | 	PARTY BUNTING  :  1706	 | 	EIRE  :  7885	 | 	
+558475  :   704	 | 	20725  :  1595	 | 	LUNCH BAG RED RETROSPOT  :  1594	 | 	Spain  :  2422	 | 	
+579777  :   686	 | 	84879  :  1489	 | 	ASSORTED COLOUR BIRD ORNAMENT  :  1489	 | 	Netherlands  :  2322	 | 	
+(Other)  :  523243	 | 	(Other)  :  516693	 | 	(Other)  :  516703	 | 	(Other)  :  14476	 | 	
 
 
 
