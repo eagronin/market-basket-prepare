@@ -71,7 +71,7 @@ temp[temp$Description != "REGENCY CAKESTAND 3 TIER",]
 
 The code above generates the follwoing output:
 
-```R
+```
 [1] REGENCY CAKESTAND 3 TIER faulty                   damages                 
 4224 Levels:   4 PURPLE FLOCK DINNER CANDLES  50'S CHRISTMAS GIFT BAG LARGE  DOLLY GIRL BEAKER  I LOVE LONDON MINI BACKPACK  I LOVE LONDON MINI RUCKSACK  NINE DRAWER OFFICE TIDY ... ZINC WIRE SWEETHEART LETTER TRAY
 
@@ -81,8 +81,9 @@ The code above generates the follwoing output:
 192292    553396     22423     damages      -21 5/16/11 16:48         0         NA United Kingdom 2011-05-16 2011-05-16 16:48:00   16     48   16.80000 NA 2011-05-16           0
 ```
 
+It appears that the 3 items that result in the mismatch represent returns (negative Quantity for each) due to "damages" for two of the items and "faulty" for the third item.  Once we get rid of returned items, this mismatch then will be resolved.
 
-same issue appears to affect StockCode 84879:
+The same issue appears to affect StockCode 84879 (1 mismatch as compared to the Description field):
 
 ```R
 temp = items[items$StockCode == 84879,]
@@ -90,15 +91,29 @@ unique(temp$Description)
 temp[temp$Description != "ASSORTED COLOUR BIRD ORNAMENT",]
 ```
 
-let's take out returns, including items with zero quantity:
+The code above generates the follwoing output:
+
+```
+[1] ASSORTED COLOUR BIRD ORNAMENT damaged                      
+4224 Levels:   4 PURPLE FLOCK DINNER CANDLES  50'S CHRISTMAS GIFT BAG LARGE  DOLLY GIRL BEAKER  I LOVE LONDON MINI BACKPACK  I LOVE LONDON MINI RUCKSACK  NINE DRAWER OFFICE TIDY ... ZINC WIRE SWEETHEART LETTER TRAY
+
+       InvoiceNo StockCode Description Quantity   InvoiceDate UnitPrice CustomerID        Country       Date            DateTime Hour Minute HourMinute            ID AmountSpent
+189300    553147     84879     damaged     -160 5/13/11 13:58         0         NA United Kingdom 2011-05-13 2011-05-13 13:58:00   13     58   13.96667 NA 2011-05-13           0
+```
+
+We can see that the mismatch resulted from one damaged item that has been returned.
+
+Let's now remove the returned items from the data.  From looking further at the data it also appears that there are a number of items with zero quantity.  Let's get rid of these observations as well:
 
 ```R
-nrow(items[items$Quantity <= 0,])   # returns
+nrow(items[items$Quantity <= 0,])   
 items = items[items$Quantity > 0,]
 nrow(items)
 ```
 
-let's now look at the remaining mismatches:
+The above code removed `10624` samples, thus reducing the total number of samples from `541909` to `531285`.
+
+Now let's look at the remaining mismatches, i.e., StockCodes 85123A (56 mismatches) and 20725 (1 mismatch).  The code below identifies the reasons for the mismatches and resolve some of the mismatches:  
 
 ```R
 temp = items[items$Description == "WHITE HANGING HEART T-LIGHT HOLDER",]
@@ -106,14 +121,47 @@ unique(temp$StockCode)
 items$StockCode[items$StockCode == "85123a"] = "85123A"
 unique(items$Description[items$StockCode == "85123A"])
 items[items$Description == "CREAM HANGING HEART T-LIGHT HOLDER",]
-items$Description[items$Description == "CREAM HANGING HEART T-LIGHT HOLDER"] = "WHITE HANGING HEART T-LIGHT HOLDER"
 
-temp = items[items$StockCode == 20725,]
+temp = items[items$StockCode == "20725",]
 unique(temp$Description)
 temp[temp$Description != "LUNCH BAG RED RETROSPOT",]
 items[items$Description == "LUNCH BAG RED SPOTTY",]
-items$Description[items$Description == "LUNCH BAG RED SPOTTY"] = "LUNCH BAG RED RETROSPOT"
 ```
+
+The output is the following:
+
+```
+[1] 85123A 85123a
+
+[1] WHITE HANGING HEART T-LIGHT HOLDER ?                                  CREAM HANGING HEART T-LIGHT HOLDER
+
+       InvoiceNo StockCode                        Description Quantity   InvoiceDate UnitPrice CustomerID        Country       Date            DateTime Hour Minute HourMinute               ID AmountSpent
+537622    581334    85123A CREAM HANGING HEART T-LIGHT HOLDER        4 12/8/11 12:07      2.95      17841 United Kingdom 2011-12-08 2011-12-08 12:07:00   12      7   12.11667 17841 2011-12-08       11.80
+538085    581395    85123A CREAM HANGING HEART T-LIGHT HOLDER        6 12/8/11 13:18      2.95      16892 United Kingdom 2011-12-08 2011-12-08 13:18:00   13     18   13.30000 16892 2011-12-08       17.70
+538215    581402    85123A CREAM HANGING HEART T-LIGHT HOLDER        6 12/8/11 13:45      2.95      14653 United Kingdom 2011-12-08 2011-12-08 13:45:00   13     45   13.75000 14653 2011-12-08       17.70
+538271    581404    85123A CREAM HANGING HEART T-LIGHT HOLDER        4 12/8/11 13:47      2.95      13680 United Kingdom 2011-12-08 2011-12-08 13:47:00   13     47   13.78333 13680 2011-12-08       11.80
+538709    581412    85123A CREAM HANGING HEART T-LIGHT HOLDER        4 12/8/11 14:38      2.95      14415 United Kingdom 2011-12-08 2011-12-08 14:38:00   14     38   14.63333 14415 2011-12-08       11.80
+539084    581432    85123A CREAM HANGING HEART T-LIGHT HOLDER       32 12/8/11 15:51      2.55      13798 United Kingdom 2011-12-08 2011-12-08 15:51:00   15     51   15.85000 13798 2011-12-08       81.60
+539343    581439    85123A CREAM HANGING HEART T-LIGHT HOLDER        1 12/8/11 16:30      5.79         NA United Kingdom 2011-12-08 2011-12-08 16:30:00   16     30   16.50000    NA 2011-12-08        5.79
+540838    581492    85123A CREAM HANGING HEART T-LIGHT HOLDER        3 12/9/11 10:03      5.79         NA United Kingdom 2011-12-09 2011-12-09 10:03:00   10      3   10.05000    NA 2011-12-09       17.37
+541640    581538    85123A CREAM HANGING HEART T-LIGHT HOLDER        1 12/9/11 11:34      2.95      14446 United Kingdom 2011-12-09 2011-12-09 11:34:00   11     34   11.56667 14446 2011-12-09        2.95
+
+[1] LUNCH BAG RED RETROSPOT LUNCH BAG RED SPOTTY   
+
+      InvoiceNo StockCode          Description Quantity   InvoiceDate UnitPrice CustomerID Country       Date            DateTime Hour Minute HourMinute               ID AmountSpent
+58133    541220     20725 LUNCH BAG RED SPOTTY      200 1/14/11 14:11      1.45      14156    EIRE 2011-01-14 2011-01-14 14:11:00   14     11   14.18333 14156 2011-01-14         290
+```
+
+As the output above shows it appears that for StockCode 85123A most of the mismatches resulted from recording some of the StockCodes as 85123a ("a" instead of "A"). This appears to be a typo, as there is nothing else in the data suggesting that StockCodes for items 85123A and 85123a should be different.
+
+After changing StockCodes 85123a to 85123A, we are still left with mismatches between StockCode and Description fields. While Description for almost all of the items with StockCode 85123A is "WHITE HANGING HEART T-LIGHT HOLDER", it appears that some of the items with this StockCode are named "CREAM HANGING HEART T-LIGHT HOLDER" and others have "?" in the description. Note that there is no overlap between the items that had StockCode 85123a (before we changed it to 85123A) and the items with "CREAM HANGING HEART T-LIGHT HOLDER" and "?" in their Description fields.
+
+The items with "?" in the description will get dropped when we remove instances with invalid or missing descriptions.  We will not make changes to the 9 items with Description "CREAM HANGING HEART T-LIGHT HOLDER" as we are not sure whether the word "CREAM" instead of "WHITE" in these few purchases (all of which were made on the same date, December 8, 2011) was used intentionally or by mistake.
+
+The mismatch between StockCode 20725 and Description amounts to one instance of "LUNCH BAG RED SPOTTY" in Description while all the other instances with this StockCode are "LUNCH BAG RED RETROSPOT".  As in the case of StockCode 85123A we will not make any changes as we are not sure whether the difference in the descriptions was made intentionally or by mistake.
+
+
+
 
 remove items with negative or zero prices
 
