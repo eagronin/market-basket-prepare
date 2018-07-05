@@ -219,21 +219,21 @@ Let's output summary statistics again using `summary(items)`:
 
 **Table 2**
 
-**Panel A. Numerical Features**
+Panel A. Numerical Features
 
 Feature Name	 | 	Min	 | 	1st Qu.	 | 	Median	 | 	Mean	 | 	3rd Qu.	 | 	Max	 | 	Missing
 :---	 | 	---:	 | 	---:	 | 	---:	 | 	---:	 | 	---:	 | 	---:	 | 	---:
-Quantity	 | 	1	 | 	1	 | 	3	 | 	10.56	 | 	11	 | 	80995	 | 	
+Quantity	 | 	1	 | 	1	 | 	3	 | 	10.56	 | 	11	 | 	80,995	 | 	
 UnitPrice	 | 	0.001	 | 	1.25	 | 	2.08	 | 	3.279	 | 	4.13	 | 	649.5	 | 	
-CustomerID	 | 	12346	 | 	13975	 | 	15159	 | 	15301	 | 	16801	 | 	18287	 | 	131459
+CustomerID	 | 	12,346	 | 	13,975	 | 	15,159	 | 	15,301	 | 	16,801	 | 	18,287	 | 	131,459
 Date	 | 	12/1/10	 | 	3/28/11	 | 	7/20/11	 | 	7/4/11	 | 	10/19/11	 | 	12/9/11	 | 	
 DateTime	 | 	12/1/10 8:26	 | 	3/28/11 12:23	 | 	7/20/11 13:26	 | 	7/4/11 21:54	 | 	10/19/11 13:38	 | 	12/9/11 12:50	 | 	
 Hour	 | 	6	 | 	11	 | 	13	 | 	13.08	 | 	15	 | 	20	 | 	
 Minute	 | 	0	 | 	16	 | 	30	 | 	30.02	 | 	44	 | 	59	 | 	
 HourMinute	 | 	6.333	 | 	11.783	 | 	13.583	 | 	13.577	 | 	15.483	 | 	20.3	 | 	
-AmountSpent	 | 	0	 | 	3.75	 | 	9.9	 | 	19.47	 | 	17.46	 | 	168469.6	 | 	
+AmountSpent	 | 	0	 | 	3.75	 | 	9.9	 | 	19.47	 | 	17.46	 | 	168,469.6	 | 	
 
-**Panel B. Non-numerical / Categorical Features**
+Panel B. Non-numerical / Categorical Features
 
 InvoiceNo	 | 	StockCode	 | 	Description	 | 	Country	 | 	ID
 :---	 | 	:---	 | 	:---	 | 	:---	 | 	:---
