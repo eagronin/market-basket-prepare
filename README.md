@@ -29,9 +29,9 @@ summary(items)                # summary stats
 apply(is.na(items), 2, sum)   # missing values
 ```
 
-The summary statistics below show that the dataset has 541,909 samples and 15 features.  They also show several patterns in the data that need to be addressed further.  Specifically, 
+The summary statistics below show that the dataset has 541,909 samples and 15 features.  They also show several patterns in the data that need to be addressed further.  Specifically, there are items with negative quantities (returns), negative prices, in Panel A.  Futher, there are mismatches between StockCode and Description counts in Panel B, while the small magnitudes of mismatches in some instances (e.g., 2203 items for StockCode 22423 versus 2200 items for REGENCY CAKESTAND 3 TIER) and exact matches in other instances (e.g., 2159 items for StockCode 85099B versus the same number of items for JUMBO BAG RED RETROSPOT) suggest that StockCode and Description counts should match.
 
-Numerical Features
+Panel A. Numerical Features
 
 Feature Name|Min.|1st Qu.|Median|Mean|3rd Qu.|Max|Missing
 |:--- |:--- |:--- |:--- |:--- |:--- |:--- |:--- |
@@ -45,7 +45,7 @@ Minute | 0 | 16 | 30 | 30.01 | 44 | 59
 HourMinute | 6.167 | 11.783 | 13.583 | 13.579 | 15.483 | 20.633	
 AmountSpent | -168469.6 | 3.4 | 9.75 | 17.99 | 17.4 | 168469.6	
 
-Non-numerical / Categorical Features
+Panel B. Non-numerical / Categorical Features
 
 InvoiceNo | StockCode | Description | InvoiceDate | Country | ID
 |:--- |:--- |:--- |:--- |:--- |:--- |
@@ -57,8 +57,11 @@ InvoiceNo | StockCode | Description | InvoiceDate | Country | ID
 579777:   687 | 84879:  1502 | ASSORTED COLOUR BIRD ORNAMENT: 1501 | 11/30/2011  3:24:27 PM: 687 | Netherlands: 2371	
 (Other): 537202 | (Other): 530366 | (Other): 530315 | (Other): 537202 | (Other):   15279	
 
-check out mismatches between StockCode and Description
-let's take a look, for example, at StockCode 22423, which has 3 mismatches with the description of "REGENCY CAKESTAND 3 TIER":
+Futher look at the data reveals that apart from the irregularities observed from the summary statistics table above, there are a number of missing or invalid descriptions, such as "?display?", "?missing", "??", "historic computer difference?....se", "POSSIBLE DAMAGES OR LOST?", etc. Also, the highest prices in the data appear against such Description fields as "AMAZON FEE", "Adjust bad debt", "POSTAGE", "DOTCOM POSTAGE", "Manual", i.e., desctiptions of various actions rather than names of items.  Finally, there are a number of cancellations that can be identified using letter "C" in the beginning of InvoiceNo.
+
+Invalid samples should be removed from the data before we run the algorithm to determine associations between customer purchases.  
+
+We will start from checking out mismatches between StockCode and Description.  Let's take a look, for example, at StockCode 22423, which has 3 mismatches with the description of "REGENCY CAKESTAND 3 TIER":
 
 ```R
 temp = items[items$StockCode == 22423,]
