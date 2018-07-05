@@ -45,7 +45,7 @@ Minute | 0 | 16 | 30 | 30.01 | 44 | 59
 HourMinute | 6.167 | 11.783 | 13.583 | 13.579 | 15.483 | 20.633	
 AmountSpent | -168469.6 | 3.4 | 9.75 | 17.99 | 17.4 | 168469.6	
 
-* Panel B. Non-numerical / Categorical Features *
+**Panel B. Non-numerical / Categorical Features**
 
 InvoiceNo | StockCode | Description | InvoiceDate | Country | ID
 |:--- |:--- |:--- |:--- |:--- |:--- |
