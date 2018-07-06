@@ -426,49 +426,44 @@ Number of distinct StockCodes	 | 	20.99	 | 	95.41	 | 	-74.43	 | 	-19.93	 | 	2.20
 Amount spent	 | 	476.10	 | 	1100.83	 | 	-624.73	 | 	-8.81	 | 	2.20E-16
 Time of purchase	 | 	13.01	 | 	14.15	 | 	-1.14	 | 	-16.27	 | 	2.20E-16
 
+It appears that the groups with and w/o CustomerIDs are statistically significantly different from one another along each dimension that we tested. Invoices in the group w/o CustomerIDs have substantially longer lists of items with larger amounts spent per invoice and are issued at a later time during the day.  Therefore, simply removing samples with missing CustomerID from the data may introduce bias into our analysis. 
 
+However, if InvoiceNo matches CustomerID closely, then we can use InvoiceNo when CustomerID is missing.  As we have seen earlier, each ID (i.e., CustomerID/Date combination) corresponds to precisely one InvoiceNo on most of the days, even though not on all days. Let's see how many shopping sessions we are going to misclassify as multiple sessions while in fact they would be combined into a smaller number of shopping sessions if CustomerID was available.
 
-We have an issue as the samples with and w/o CustomerID are quite different. Therefore, simply removing samples with missing CustomerID from the data
-may introduce bias into our analysis. However, if InvoiceNo matches CustomerID closely, then we can use InvoiceNo when customer id is missing.
-
-what is the fraction of CustomerIDs that are missing?
+First let's check the fraction of CustomerIDs that are missing in the dataset:
 
 ```R
 sum(is.na(items$CustomerID))/nrow(items)
 ```
 
-we find that about 24.93% are missing
+we find that, as we pointed out earlier, 0.249 (or about 25%) of samples have missing CustomerIDs.
 
-what is the fraction of IDs with multiple invoices in the sample of non-missing CustomerIDs?  We can assume that this fraction is the same
-in the sample of missing CustomerIDs.  This fraction is:
+What is the fraction of IDs (CustomerID/Date combinations) with multiple invoices in the group with non-missing CustomerIDs?  This fraction is calculated as
 
 ```R
 1-IDs_per_numOfInvoices[1]/sum(IDs_per_numOfInvoices)
 ```
 
-This result means that if we were to replace CustomerID with InvoiceNo in the sample with non-missing CustomerID, we would 
-misclassify 8.20% of shopping trips as different shopping session, while they, in fact, were part of other shopping sessions.
+and equals to 0.082.  This result means that if we were to replace CustomerID/Date combinations with InvoiceNo in the group with non-missing CustomerID, we would misclassify 8.2% of shopping sessions as separate shopping sessions, while they, in fact, were part of other shopping sessions. Let's assume that this fraction is the same in the group with missing CustomerIDs.  
 
-what is the fraction of IDs with multiple invoices in the entire sample?
+Then, if we misclassify 8.2% of shopping sessions in the group with missing CustomerIDs, how many shopping sessions do we misclassify as a fraction of the total number of shopping sessions in the entire dataset?  This can be calculated as product of the fraction of IDs with multiple invoices in the group with missing CustomerIDs (8.2%) and the fraction of samples with missing CustomerIDs (24.9%):
 
 ```R
 (1-IDs_per_numOfInvoices[1]/sum(IDs_per_numOfInvoices)) * (sum(is.na(items$CustomerID))/nrow(items))
 ```
 
-we end up with 2.04% of the shopping sessions that occured on different days misclassified as shopping trips that occured on the same day.  
-for the subsequent analysis we will prefer this small amount of misclassification over losing 25% of observations and risking bias in the analysis
-if the missing observations are not representative of the rest of the data.
+which results in 2.04% of misclassified shopping shopping sessions.  For the subsequent analysis we will prefer to have this small fraction of misclassified shopping sessions over losing 25% of observations and risking bias in the analysis that we discussed above.
 
-let's replace the missing IDs with InvoiceNo / Date combinations
+The code below replaces the missing IDs using InvoiceNo / Date combinations:
 
 ```R
 items$ID[is.na(items$CustomerID)] =
           paste(as.character(items$InvoiceNo[is.na(items$CustomerID)])
               , as.character(items$Date[is.na(items$CustomerID)]))   # suppliment missing IDs with (invoice no, date) combinations
-```
 
-we end up with this number of shopping sessions:
-
-```R
 length(unique(items$ID))
 ```
+
+This results in the total of 18,062 shopping sessions.
+
+Next step: [Analysis](https://eagronin.github.io/market-basket-analyze/)
