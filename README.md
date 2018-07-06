@@ -1,11 +1,11 @@
 # Data Preparation
 
 ## Overview
-This section summarizes the process of initial exploration and cleaning of the data from a UK-based online retailer.  The data are used in the [next section](https://eagronin.github.io/market-basket-prepare/) to discover co-occurrence relationships among customers’ purchase activities, such as the likelihood to purchase a candle holder if the customer already has candles and matches in their shopping cart. Such an analysis is called market basket analysis or association analysis.  It is commonly used in marketing to increase the chance of cross-selling, provide recommendations to customers (e.g., based on their browsing history) and deliver targeted marketing (e.g., offer coupons to customers for products that are frequently purchased together with items that the customers recently bought).
+This section summarizes the process of initial exploration and cleaning of the data from a UK-based online retailer.  The data are used in the [next section](https://eagronin.github.io/market-basket-analyze/) to discover co-occurrence relationships among customers’ purchase activities, such as the likelihood to purchase a candle holder if the customer already has candles and matches in their shopping cart. Such an analysis is called market basket analysis or association analysis.  It is commonly used in marketing to increase the chance of cross-selling, provide recommendations to customers (e.g., based on their browsing history) and deliver targeted marketing (e.g., offer coupons to customers for products that are frequently purchased together with items that the customers recently bought).
 
 Description and importing of the data are provided in the [previous section](https://eagronin.github.io/market-basket-acquire/).
 
-The market basket analysis is discussed in the [next section](https://eagronin.github.io/market-basket-prepare/).
+The market basket analysis is discussed in the [next section](https://eagronin.github.io/market-basket-analyze/).
 
 The analysis for this project was performed in R.
 
