@@ -1,7 +1,7 @@
 # Data Preparation
 
 ## Overview
-This section summarizes the process of initial exploration and cleaning of the data from a UK-based online retailer.  The data are used in the [next section](https://eagronin.github.io/market-basket-prepare/) to discover co-occurrence relationships among customers’ purchase activities. Such an analysis is called market basket analysis or association analysis.  It is commonly used in marketing to increase the chance of cross-selling, provide recommendations to customers (e.g., based on their browsing history) and deliver targeted marketing (e.g., offer coupons to customers for products that are frequently purchased together with items that the customers recently bought).
+This section summarizes the process of initial exploration and cleaning of the data from a UK-based online retailer.  The data are used in the [next section](https://eagronin.github.io/market-basket-prepare/) to discover co-occurrence relationships among customers’ purchase activities, such as the likelihood to purchase a candle holder if the customer already has candles and matches in their shopping cart. Such an analysis is called market basket analysis or association analysis.  It is commonly used in marketing to increase the chance of cross-selling, provide recommendations to customers (e.g., based on their browsing history) and deliver targeted marketing (e.g., offer coupons to customers for products that are frequently purchased together with items that the customers recently bought).
 
 The market basket analysis is discussed in the [next section](https://eagronin.github.io/market-basket-prepare/).
 
@@ -247,8 +247,6 @@ InvoiceNo	 | 	StockCode	 | 	Description	 | 	Country	 | 	ID
 579777  :   686	 | 	84879  :  1489	 | 	ASSORTED COLOUR BIRD ORNAMENT  :  1489	 | 	Netherlands  :  2322	 | 	
 (Other)  :  523243	 | 	(Other)  :  516693	 | 	(Other)  :  516703	 | 	(Other)  :  14476	 | 	
 
-
-
 The summary statistics look reasonable now, except we have not addressed the issue of missing CustomerIDs yet.  This feature is important for defining a shopoing session.  Because our goal is to identify co-occurrence relationships among customers’ purchase activities, it is important to define a timeframe within which such purchase activities should be counted toward co-occurence relationship.  If we were to analyze customer visits to a local supermarket, it would be pretty intuitive to define a shopping session as one trip to the supermarket.  However, when online shopping is considered, defining a shopping session is more subtle.  What if a customer has two invoices within the same day?  Should these invoices be considered as two separate shopping sessions?  What if the difference in the time stamps on these invoices is only one minute?  Maybe the only reason that we see two invoices instead of just one is because the customer made many purchases and decided to break them out into two invoices?  In that case it would be reasonable to consider the items on both invoices as part of the same shopping session.  However, if the time difference between the two invoices is 10 hours, it might rather be reasonable to consider them as separate shopping sessions (i.e., seeing items on the website during the earlier shopping session could affect purchasing behavior during that session but not during the later sessions). 
 
 If we decide, for example, to define a shopping session for a customer as all the shopping that the customer did on the the website within one day, then a shopping session can be uniquely identified by CustomerID and InvoiceDate.  In that case availability of CustomerID is crucial.  However, if we decide to use invoices as proxies for shopping sessions, then we need only a unique invoice number (InvoiceNo) and do not need CustomerID.  
@@ -297,7 +295,7 @@ temp$InvoiceNo = rownames(temp)        # convert rownmaes (InvoiceNo) to a varia
 by_no_days_invoice = tapply(temp$InvoiceNo, temp$by_InvoiceNo, FUN = function(x) length(x))
 ```
 
-How many invoices are there per ID (i.e., CustomerId/InvoiceDate) group? How many IDs are there with only one invoice? with 2 invoices? etc.  The code below plots the 
+How many invoices are there per ID (i.e., CustomerId/InvoiceDate) group? How many IDs are there with only one invoice? with 2 invoices? etc.  The code below plots the count of IDs as a function of the number of invoices issued on the same day:
 
 ```R
 invoices_per_ID = with(items[!is.na(items$CustomerID),], tapply(InvoiceNo, ID, FUN = function(x) length(unique(x))))
@@ -316,7 +314,12 @@ axis(side=2, cex.axis = 0.8, lwd=2, tck=-.005)
 box(which = "plot", bty = "l", lwd=2)
 ```
 
-The chart below shows that while majority of IDs correspond to one invoice only, a non-trivial number of IDs correspond to two or more invoices issued on the same date.  As we pointed out above, if there are large time differences between such invoices (e.g., several hours) we may consider using InvoiceNo instead of ID to identify shopping sessions.   
+The chart below shows that while majority of IDs correspond to one invoice only, a non-trivial number of IDs correspond to two or more invoices issued on the same date.  
+
+**insert chart here**
+
+
+As we pointed out above, if there are large time differences between such invoices (e.g., several hours) we may consider using InvoiceNo instead of ID to identify shopping sessions.   
 
 However, by looking at the data it appears that invoices issued to a customer on the same day tend to be stamped within minutes from each other. We check this out for the group of customers with exactly 2 invoices per day.  According to the chart above, this is the second largest group following the group with 1 invoice per day.
 
@@ -366,25 +369,18 @@ mean of x mean of y
 ```
 
 
-This, in turn, implies that we should use CustomerID for identifying shopping sessions.  Would we have an issue if we removed the samples with the missing customer IDs?  Let's compare the samples with and without customer ID.  If the samples with CustomerID are representative of the samples without CustomerID, then removing samples without CutomerID will not bias the results. However, if there are systemic differences between the two groups, then simply removing samples without CutomerID may bias the results, i.e., co-occurrence relationships among customers’ purchase activities that we will identify using the samples with CustomerID are going to generate incorrect recommendations for the customers represented by the samples without CustomerID.
+This, in turn, implies that we should use CustomerID for identifying shopping sessions.  Would we have an issue if we removed the samples with missing customer IDs?  Let's compare the samples with and without customer ID.  If the samples with CustomerID are representative of the samples without CustomerID, then removing samples without CutomerID will not bias the results. However, if there are systemic differences between the two groups, then simply removing samples without CutomerID may bias the results, i.e., co-occurrence relationships among customers’ purchase activities that we will identify using the samples with CustomerID are going to generate incorrect recommendations for the customers represented by the samples without CustomerID.
 
-
-
-
-
-
-
-
-
-
-split into two samples
+We first split the dataset into two groups: with CustomerID available and with CustomerID missing:
 
 ```R
 with_cust_id = items[!is.na(items$CustomerID),]
 no_cust_id = items[is.na(items$CustomerID),]
 ```
 
-number of distinct StockCodes per invoice
+Then we calculate the number of distinct StockCodes per invoice, amount spent per invoice and hour of purchase for each group and perform a means comparison test for the two groups.  The code is shown below:
+
+1. Calculate the number of distinct StockCodes per invoice for each group and compare the means using a t-test:
 
 ```R
 dist_scode_with_id = tapply(with_cust_id$StockCode, with_cust_id$InvoiceNo, FUN = function(x) length(unique(x)))
@@ -392,7 +388,7 @@ dist_scode_no_id = tapply(no_cust_id$StockCode, no_cust_id$InvoiceNo, FUN = func
 t.test(dist_scode_with_id, dist_scode_no_id)
 ```
 
-amount spent per invoice
+2. Calculate the amount spent per invoice for each group and compare the means using a t-test:
 
 ```R
 spent_with_id = tapply(with_cust_id$AmountSpent, with_cust_id$InvoiceNo, FUN = sum)
@@ -400,8 +396,7 @@ spent_no_id = tapply(no_cust_id$AmountSpent, no_cust_id$InvoiceNo, FUN = sum)
 t.test(spent_with_id, spent_no_id)
 ```
 
-hour of purchase (use mode function to determine the most frequent occurance of hour to prevent typos affecting results, 
-as an invoice hour should be the same for all items contained in it)
+Select the time of purchase per invoice for each group (we calculate the most frequent occurance of time across items that belong to the same invoice to prevent typos affecting results, as invoice time should be the same for all items contained in it), and compare the means using a t-test:
 
 ```R
 hour_with_id = tapply(
@@ -420,6 +415,17 @@ hour_no_id = tapply(
 )
 t.test(hour_with_id, hour_no_id)
 ```
+
+The results of the above tests are summarized below:
+
+**Table 3**
+
+Metric of Interest  per Invoice	 | 	Mean (CustomerID is Available)	 | 	Meand (CustomerID is Missing)	 | 	Difference	 | 	t-statistic	 | 	p-value
+:---	 | 	---:	 | 	---:	 | 	---:	 | 	---:	 | 	---:
+Number of distinct StockCodes	 | 	20.99	 | 	95.41	 | 	-74.43	 | 	-19.93	 | 	2.20E-16
+Amount spent	 | 	476.10	 | 	1100.83	 | 	-624.73	 | 	-8.81	 | 	2.20E-16
+Time of purchase	 | 	13.01	 | 	14.15	 | 	-1.14	 | 	-16.27	 | 	2.20E-16
+
 
 
 We have an issue as the samples with and w/o CustomerID are quite different. Therefore, simply removing samples with missing CustomerID from the data
