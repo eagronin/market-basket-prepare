@@ -34,8 +34,7 @@ The summary statistics below show that the dataset has 541,909 samples and 14 fe
 
 The summary statistics also show several patterns in the data that need to be addressed further.  Specifically, 135,080 CustomerIDs are missing, which is approximately 25% of the dataset.  Further, there are items with negative quantities (returns) and negative prices (see Panel A); mismatches between StockCode and Description counts (see Panel B), while the small magnitudes of mismatches in some instances (e.g., 2203 items for StockCode 22423 versus 2200 items for REGENCY CAKESTAND 3 TIER) and exact matches in other instances (e.g., 2159 items for StockCode 85099B versus the same number of items for JUMBO BAG RED RETROSPOT) suggest that StockCode and Description counts should match.
 
-**TABLE 1**
-
+**Table 1**<br/>
 Panel A. Numerical Features
 
 Feature Name|Min.|1st Qu.|Median|Mean|3rd Qu.|Max|Missing
@@ -221,8 +220,7 @@ The number of observations remains at `527944`, which means that all the cancell
 
 Let's output summary statistics again using `summary(items)`:
 
-**Table 2**
-
+**Table 2**<br/>
 Panel A. Numerical Features
 
 Feature Name	 | 	Min	 | 	1st Qu.	 | 	Median	 | 	Mean	 | 	3rd Qu.	 | 	Max	 | 	Missing
@@ -251,22 +249,21 @@ InvoiceNo	 | 	StockCode	 | 	Description	 | 	Country	 | 	ID
 
 
 
-there is a big chunk of missing customer IDs.  Should we use invoices instead?
-let's understand better the difference between these two variables:
+The summary statistics look reasonable now, except we have not addressed the issue of missing CustomerIDs yet.  This feature is important for defining a shopoing session.  Because our goal is to identify co-occurrence relationships among customers’ purchase activities, it is important to define a timeframe within which such purchase activities should be counted toward co-occurence relationship.  If we were to analyze customer visits to a local supermarket, it would be pretty intuitive to define a shopping session as one trip to the supermarket.  However, when online shopping is considered, defining a shopping session is more subtle.  What if a customer has two invoices within the same day?  Should these invoices be considered as two separate shopping sessions?  What if the difference in the time stamps on these invoices is only one minute?  Maybe the only reason that we see two invoices instead of just one is because the customer made many purchases and decided to break them out into two invoices?  In that case it would be reasonable to consider the items on both invoices as part of the same shopping session.  However, if the time difference between the two invoices is 10 hours, it might rather be reasonable to consider them as separate shopping sessions (i.e., seeing items on the website during the earlier shopping session could affect purchasing behavior during that session but not during the later sessions). 
 
-output unique IDs
+If we decide, for example, to define a shopping session for a customer as all the shopping that the customer did on the the website within one day, then a shopping session can be uniquely identified by CustomerID and InvoiceDate.  In that case availability of CustomerID is crucial.  However, if we decide to use invoices as proxies for shopping sessions, then we need only a unique invoice number (InvoiceNo) and do not need CustomerID.  
+
+Let's understand better the difference between CustomerID and InvoiceNo. The code below outputs the number of unique values of CustomerID, InvoiceNo, and an ID variable that we defined earlier by concatenating CustomerID and Date (i.e., the date of the invoice).  
 
 ```R
 length(unique(items$CustomerID))
-length(unique(items$InvoiceNo))
 length(unique(items$InvoiceNo[!is.na(items$CustomerID)]))
-length(unique(items$ID))
+length(unique(items$ID[!is.na(items$CustomerID)]))
 ```
 
-it appears that there are substantially more invoices than customers, which is consistent with uniquness of invoice number, per definition, while 
-customers could have made purchases on different days.  In that case, purchases by the same customer will have the same cutomer ID but different
-invoice numbers.
-are there customers who made purchases on different days?
+It appears that we have 4336 unique CustomerIDs, 18416 unique values for InvoiceNo (when CustomerID is not missing) and 16689 unique IDs (, also when CustomerID is not missing).  We can see that the number of unique CustomerIDs is substantially lower than the number of unique values for InvoiceNo and ID.  This could be a result of cusomters making purchases on multiple dates. Hence, a few customers can generate a large number of unique invoices as well as a large number of unique IDs (because ID is defined as a CustomerID/InvoiceDate combination).
+
+In that case, purchases by the same customer will have the same cutomer ID but different invoice numbers.  Let's check if there are customers who made purchases on different days and plot the number of customers as a function of the number of days on which they made purchases:
 
 ```R
 by_customerID = tapply(items$Date, items$CustomerID, FUN = function(x) length(unique(x)))   # group unique dates by customer ID
@@ -283,16 +280,24 @@ axis(side=2, cex.axis = 0.8, lwd=2, tck=-.005)
 box(which = "plot", bty = "l", lwd=2)
 ```
 
-are there identical invoice numbers that appear on different days? I.e., are invoice numbers unique to each transaction?
+The bar chart generated by the code above is shown below:
+
+**insert chart here**
+
+
+The chart shows that, while many customers made purchases on one day only, a large number of customers indeed shopped on multiple days over approximatley one year period over which data are available.
+
+InvoiceNo values are unique as reported on the official website from which the data were downloaded, and as the code below verifies by finding that there are no invoices with the same InvoiceNo issued on multiple days:
 
 ```R
+length(unique(items$InvoiceNo))
 by_InvoiceNo = tapply(items$Date, items$InvoiceNo, FUN = function(x) length(unique(x)))   # group unique dates by InvoiceNo
 temp = as.data.frame(by_InvoiceNo)     # convert vector to dateframe
 temp$InvoiceNo = rownames(temp)        # convert rownmaes (InvoiceNo) to a variable
 by_no_days_invoice = tapply(temp$InvoiceNo, temp$by_InvoiceNo, FUN = function(x) length(x))
 ```
 
-how many invoices are there per (customer id, date) group? How many CustomerIDs are there with only one invoice per day? with 2 invoices per day? etc.
+How many invoices are there per ID (i.e., CustomerId/InvoiceDate) group? How many IDs are there with only one invoice? with 2 invoices? etc.  The code below plots the 
 
 ```R
 invoices_per_ID = with(items[!is.na(items$CustomerID),], tapply(InvoiceNo, ID, FUN = function(x) length(unique(x))))
@@ -302,8 +307,8 @@ temp$ID = rownames(temp)        # convert rownmaes (customer ID) to a variable
 items = merge(items, temp, by = "ID", all.x = TRUE)
 IDs_per_numOfInvoices = tapply(temp$ID, temp$invoices_per_ID, FUN = function(x) length(x))
 
-barplot(IDs_per_numOfInvoices, main = "Count of Customers by Number of Invoices\nIssued on the Same Day"
-        , ylab = "Number of Customers", xlab = "Number of Invoices Issued on the Same Day to a Customer"
+barplot(IDs_per_numOfInvoices, main = "Count of IDs (CustomerID/InvoiceDate Combinations)\nby Number of Invoices Issued on the Same Day"
+        , ylab = "Number of IDs", xlab = "Number of Invoices Issued on the Same Day to a Customer"
         , xlim = c(0.2, 5), ylim = c(0, 16000)
         , frame.plot=FALSE, cex.main=1.5, cex.lab = .8, xaxt="n", yaxt="n", col="blue", pch = 20, type = "o")
 axis(side=1, cex.axis = 0.8, lwd=2, tck=-.005)
@@ -311,10 +316,9 @@ axis(side=2, cex.axis = 0.8, lwd=2, tck=-.005)
 box(which = "plot", bty = "l", lwd=2)
 ```
 
+The chart below shows that while majority of IDs correspond to one invoice only, a non-trivial number of IDs correspond to two or more invoices issued on the same date.  As we pointed out above, if there are large time differences between such invoices (e.g., several hours) we may consider using InvoiceNo instead of ID to identify shopping sessions.   
 
-By looking at the data it appears that invoices tend to be stamped within minutes from each other. We check this 
-out for the group of customers with exactly 2 invoices per day.  According to the chart above, this is the second largest group 
-after the group with 1 invoice per day.
+However, by looking at the data it appears that invoices issued to a customer on the same day tend to be stamped within minutes from each other. We check this out for the group of customers with exactly 2 invoices per day.  According to the chart above, this is the second largest group following the group with 1 invoice per day.
 
 ```R
 keeps = c("ID", "InvoiceNo", "DateTime")
@@ -327,12 +331,9 @@ wide$Diff = abs(wide$DateTime.2 - wide$DateTime.1)/60     # convert from seconds
 median(wide$Diff, na.rm = TRUE)
 ```
 
-Could it be that customers split their purchases into several invoices when they have too many items? 
-To test this, we can comare the average number of distinct StockCodes per invoice between the group with one invoice per day and the group with 
-multipe invoices per day.  If this reasoning holds, then it would make sense to consider 
-multiple invoices paid on the same day for the same customer to be considered parts of the same shopping session. In that case, using customer ID
-is preferrable to using InoiceNo, as InvoiceNo does not represent a separate shopping session. 
-The t-test below shows that this is indeed the case, which suggests that we should use customer ID for identifying shopping sessions:
+It appears that the median time difference between two invoices issued on the same date is 2 minutes.  This amount of time is too short to consider the two invoices as proxies for two separate shopping sessions.  Rather, it is possible that customers who purchase more items tend to break out their purchases into multiple invoices.  In order to test this hypothesis we comare the average number of distinct StockCodes per invoice between the group with one invoice per day and the group with multipe invoices per day.  If this hypothesis is true, then it would make sense to consider multiple invoices issued on the same day for the same customer as parts of the same shopping session. In that case, using CustomerID is preferrable to using InoiceNo. 
+
+The code below performs a t-test to determine if this hypothesis is true:
 
 ```R
 keeps = c("ID", "StockCode")
@@ -349,8 +350,32 @@ median(many_invoices, na.rm = TRUE)
 t.test(one_invoice, many_invoices)
 ```
 
-Would we have an issue if we removed the samples with missing customer IDs?  Let's compare the samples with and without 
-customer ID:
+The results of the t-test below show that indeed, customers who purchase more items tend to break out their purchases into multiple invoices.  The output of the t-test shows that the average numbers of distinct items in the group with one invoice per day and the group with multipe invoices per day are 22.1 adn 32.7, respectively, and the difference is statistically significant.  This suggests that the existence of multiple invoices for a customer on the same day is a result of artificially splitting one large invoice into multiple smaller invoices, which does not justify using InvoiceNo as a proxy for a shopping session.
+
+```
+	Welch Two Sample t-test
+
+data:  one_invoice and many_invoices
+t = -12.685, df = 1533.9, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -12.264783  -8.979764
+sample estimates:
+mean of x mean of y 
+ 22.14106  32.76333 
+```
+
+
+This, in turn, implies that we should use CustomerID for identifying shopping sessions.  Would we have an issue if we removed the samples with the missing customer IDs?  Let's compare the samples with and without customer ID.  If the samples with CustomerID are representative of the samples without CustomerID, then removing samples without CutomerID will not bias the results. However, if there are systemic differences between the two groups, then simply removing samples without CutomerID may bias the results, i.e., co-occurrence relationships among customers’ purchase activities that we will identify using the samples with CustomerID are going to generate incorrect recommendations for the customers represented by the samples without CustomerID.
+
+
+
+
+
+
+
+
+
 
 split into two samples
 
