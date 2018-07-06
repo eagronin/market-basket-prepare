@@ -11,7 +11,7 @@ The analysis for this project was performed in R.
 
 ## Data Exploration and Cleaning
 
-We start by generating a few features that we will use in subsequent analysis.  These features inlude the date and time of the invoice, the total amount spent equal to the product of the item's price and quantity purchased, and an ID variable identifying all purchases by a customer on a particular day:
+We start by generating a few features that we will use in subsequent analysis.  These features inlude the date and time of the invoice ("Date" and "HourMinute", respectively), the total amount spent equal to the product of the item's price and quantity purchased ("AmountSpent"), and an ID variable identifying all purchases by a customer on a particular day ("ID"):
 
 ```R
 items$Date = as.Date(items$InvoiceDate, "%m/%d/%y")               # create date variable from InvoiceDate, which also includes time
@@ -29,7 +29,6 @@ With all the features in place, let's take a look at the summary statistics gene
 ```R
 dim(items)                    # dimensions
 summary(items)                # summary stats
-apply(is.na(items), 2, sum)   # missing values
 ```
 
 The summary statistics below show that the dataset has 541,909 samples and 14 features.  The customers reside predominantly in the UK, make approximately 50% of their purchases between 11:45am and 3:30pm (see HourMinute feature) and buy the median quantity of 3 units per item at the median price of 2.08 pounds per unit. We note and discuss further below that an invoice may include multiple items.
@@ -79,12 +78,11 @@ The code above generates the follwoing output:
 
 ```
 [1] REGENCY CAKESTAND 3 TIER faulty                   damages                 
-4224 Levels:   4 PURPLE FLOCK DINNER CANDLES  50'S CHRISTMAS GIFT BAG LARGE  DOLLY GIRL BEAKER  I LOVE LONDON MINI BACKPACK  I LOVE LONDON MINI RUCKSACK  NINE DRAWER OFFICE TIDY ... ZINC WIRE SWEETHEART LETTER TRAY
 
-       InvoiceNo StockCode Description Quantity   InvoiceDate UnitPrice CustomerID        Country       Date            DateTime Hour Minute HourMinute            ID AmountSpent
-21339     538072     22423      faulty      -13 12/9/10 14:10         0         NA United Kingdom 2010-12-09 2010-12-09 14:10:00   14     10   14.16667 NA 2010-12-09           0
-114429    546010     22423     damages      -19  3/8/11 15:55         0         NA United Kingdom 2011-03-08 2011-03-08 15:55:00   15     55   15.91667 NA 2011-03-08           0
-192292    553396     22423     damages      -21 5/16/11 16:48         0         NA United Kingdom 2011-05-16 2011-05-16 16:48:00   16     48   16.80000 NA 2011-05-16           0
+       InvoiceNo StockCode Description Quantity UnitPrice CustomerID        Country       Date            DateTime Hour Minute HourMinute            ID AmountSpent
+21339     538072     22423      faulty      -13         0         NA United Kingdom 2010-12-09 2010-12-09 14:10:00   14     10   14.16667 NA 2010-12-09           0
+114429    546010     22423     damages      -19         0         NA United Kingdom 2011-03-08 2011-03-08 15:55:00   15     55   15.91667 NA 2011-03-08           0
+192292    553396     22423     damages      -21         0         NA United Kingdom 2011-05-16 2011-05-16 16:48:00   16     48   16.80000 NA 2011-05-16           0
 ```
 
 It appears that the 3 items that result in the mismatch represent returns (negative Quantity for each) due to "damages" for two of the items and "faulty" for the third item.  Once we get rid of returned items, this mismatch then will be resolved.
@@ -101,10 +99,9 @@ The code above generates the follwoing output:
 
 ```
 [1] ASSORTED COLOUR BIRD ORNAMENT damaged                      
-4224 Levels:   4 PURPLE FLOCK DINNER CANDLES  50'S CHRISTMAS GIFT BAG LARGE  DOLLY GIRL BEAKER  I LOVE LONDON MINI BACKPACK  I LOVE LONDON MINI RUCKSACK  NINE DRAWER OFFICE TIDY ... ZINC WIRE SWEETHEART LETTER TRAY
 
-       InvoiceNo StockCode Description Quantity   InvoiceDate UnitPrice CustomerID        Country       Date            DateTime Hour Minute HourMinute            ID AmountSpent
-189300    553147     84879     damaged     -160 5/13/11 13:58         0         NA United Kingdom 2011-05-13 2011-05-13 13:58:00   13     58   13.96667 NA 2011-05-13           0
+       InvoiceNo StockCode Description Quantity UnitPrice CustomerID        Country       Date            DateTime Hour Minute HourMinute            ID AmountSpent
+189300    553147     84879     damaged     -160         0         NA United Kingdom 2011-05-13 2011-05-13 13:58:00   13     58   13.96667 NA 2011-05-13           0
 ```
 
 We can see that the mismatch resulted from one damaged item that has been returned.
@@ -141,21 +138,21 @@ The output is the following:
 
 [1] WHITE HANGING HEART T-LIGHT HOLDER ?                                  CREAM HANGING HEART T-LIGHT HOLDER
 
-       InvoiceNo StockCode                        Description Quantity   InvoiceDate UnitPrice CustomerID        Country       Date            DateTime Hour Minute HourMinute               ID AmountSpent
-537622    581334    85123A CREAM HANGING HEART T-LIGHT HOLDER        4 12/8/11 12:07      2.95      17841 United Kingdom 2011-12-08 2011-12-08 12:07:00   12      7   12.11667 17841 2011-12-08       11.80
-538085    581395    85123A CREAM HANGING HEART T-LIGHT HOLDER        6 12/8/11 13:18      2.95      16892 United Kingdom 2011-12-08 2011-12-08 13:18:00   13     18   13.30000 16892 2011-12-08       17.70
-538215    581402    85123A CREAM HANGING HEART T-LIGHT HOLDER        6 12/8/11 13:45      2.95      14653 United Kingdom 2011-12-08 2011-12-08 13:45:00   13     45   13.75000 14653 2011-12-08       17.70
-538271    581404    85123A CREAM HANGING HEART T-LIGHT HOLDER        4 12/8/11 13:47      2.95      13680 United Kingdom 2011-12-08 2011-12-08 13:47:00   13     47   13.78333 13680 2011-12-08       11.80
-538709    581412    85123A CREAM HANGING HEART T-LIGHT HOLDER        4 12/8/11 14:38      2.95      14415 United Kingdom 2011-12-08 2011-12-08 14:38:00   14     38   14.63333 14415 2011-12-08       11.80
-539084    581432    85123A CREAM HANGING HEART T-LIGHT HOLDER       32 12/8/11 15:51      2.55      13798 United Kingdom 2011-12-08 2011-12-08 15:51:00   15     51   15.85000 13798 2011-12-08       81.60
-539343    581439    85123A CREAM HANGING HEART T-LIGHT HOLDER        1 12/8/11 16:30      5.79         NA United Kingdom 2011-12-08 2011-12-08 16:30:00   16     30   16.50000    NA 2011-12-08        5.79
-540838    581492    85123A CREAM HANGING HEART T-LIGHT HOLDER        3 12/9/11 10:03      5.79         NA United Kingdom 2011-12-09 2011-12-09 10:03:00   10      3   10.05000    NA 2011-12-09       17.37
-541640    581538    85123A CREAM HANGING HEART T-LIGHT HOLDER        1 12/9/11 11:34      2.95      14446 United Kingdom 2011-12-09 2011-12-09 11:34:00   11     34   11.56667 14446 2011-12-09        2.95
+       InvoiceNo StockCode                        Description Quantity UnitPrice CustomerID        Country       Date            DateTime Hour Minute HourMinute               ID AmountSpent
+537622    581334    85123A CREAM HANGING HEART T-LIGHT HOLDER        4      2.95      17841 United Kingdom 2011-12-08 2011-12-08 12:07:00   12      7   12.11667 17841 2011-12-08       11.80
+538085    581395    85123A CREAM HANGING HEART T-LIGHT HOLDER        6      2.95      16892 United Kingdom 2011-12-08 2011-12-08 13:18:00   13     18   13.30000 16892 2011-12-08       17.70
+538215    581402    85123A CREAM HANGING HEART T-LIGHT HOLDER        6      2.95      14653 United Kingdom 2011-12-08 2011-12-08 13:45:00   13     45   13.75000 14653 2011-12-08       17.70
+538271    581404    85123A CREAM HANGING HEART T-LIGHT HOLDER        4      2.95      13680 United Kingdom 2011-12-08 2011-12-08 13:47:00   13     47   13.78333 13680 2011-12-08       11.80
+538709    581412    85123A CREAM HANGING HEART T-LIGHT HOLDER        4      2.95      14415 United Kingdom 2011-12-08 2011-12-08 14:38:00   14     38   14.63333 14415 2011-12-08       11.80
+539084    581432    85123A CREAM HANGING HEART T-LIGHT HOLDER       32      2.55      13798 United Kingdom 2011-12-08 2011-12-08 15:51:00   15     51   15.85000 13798 2011-12-08       81.60
+539343    581439    85123A CREAM HANGING HEART T-LIGHT HOLDER        1      5.79         NA United Kingdom 2011-12-08 2011-12-08 16:30:00   16     30   16.50000    NA 2011-12-08        5.79
+540838    581492    85123A CREAM HANGING HEART T-LIGHT HOLDER        3      5.79         NA United Kingdom 2011-12-09 2011-12-09 10:03:00   10      3   10.05000    NA 2011-12-09       17.37
+541640    581538    85123A CREAM HANGING HEART T-LIGHT HOLDER        1      2.95      14446 United Kingdom 2011-12-09 2011-12-09 11:34:00   11     34   11.56667 14446 2011-12-09        2.95
 
 [1] LUNCH BAG RED RETROSPOT LUNCH BAG RED SPOTTY   
 
-      InvoiceNo StockCode          Description Quantity   InvoiceDate UnitPrice CustomerID Country       Date            DateTime Hour Minute HourMinute               ID AmountSpent
-58133    541220     20725 LUNCH BAG RED SPOTTY      200 1/14/11 14:11      1.45      14156    EIRE 2011-01-14 2011-01-14 14:11:00   14     11   14.18333 14156 2011-01-14         290
+      InvoiceNo StockCode          Description Quantity UnitPrice CustomerID Country       Date            DateTime Hour Minute HourMinute               ID AmountSpent
+58133    541220     20725 LUNCH BAG RED SPOTTY      200      1.45      14156    EIRE 2011-01-14 2011-01-14 14:11:00   14     11   14.18333 14156 2011-01-14         290
 ```
 
 As the output above shows it appears that for StockCode 85123A most of the mismatches resulted from recording some of the StockCodes as 85123a ("a" instead of "A"). This appears to be a typo, as there is nothing else in the data suggesting that StockCodes for items 85123A and 85123a should be different.
@@ -178,9 +175,9 @@ nrow(items)
 The code above generates the following output:
 
 ```
-       InvoiceNo StockCode     Description Quantity   InvoiceDate UnitPrice CustomerID        Country       Date            DateTime Hour Minute HourMinute            ID AmountSpent
-299984   A563186         B Adjust bad debt        1 8/12/11 14:51 -11062.06         NA United Kingdom 2011-08-12 2011-08-12 14:51:00   14     51   14.85000 NA 2011-08-12   -11062.06
-299985   A563187         B Adjust bad debt        1 8/12/11 14:52 -11062.06         NA United Kingdom 2011-08-12 2011-08-12 14:52:00   14     52   14.86667 NA 2011-08-12   -11062.06
+       InvoiceNo StockCode     Description Quantity UnitPrice CustomerID        Country       Date            DateTime Hour Minute HourMinute            ID AmountSpent
+299984   A563186         B Adjust bad debt        1 -11062.06         NA United Kingdom 2011-08-12 2011-08-12 14:51:00   14     51   14.85000 NA 2011-08-12   -11062.06
+299985   A563187         B Adjust bad debt        1 -11062.06         NA United Kingdom 2011-08-12 2011-08-12 14:52:00   14     52   14.86667 NA 2011-08-12   -11062.06
 
 [1] 1179
 
@@ -251,7 +248,7 @@ InvoiceNo	 | 	StockCode	 | 	Description	 | 	Country	 | 	ID
 
 The summary statistics look reasonable now, except we have not addressed the issue of missing CustomerIDs yet.  This feature is important for defining a shopoing session.  Because our goal is to identify co-occurrence relationships among customers’ purchase activities, it is important to define a timeframe within which such purchase activities should be counted toward co-occurence relationship.  If we were to analyze customer visits to a local supermarket, it would be pretty intuitive to define a shopping session as one trip to the supermarket.  However, when online shopping is considered, defining a shopping session is more subtle.  What if a customer has two invoices within the same day?  Should these invoices be considered as two separate shopping sessions?  What if the difference in the time stamps on these invoices is only one minute?  Maybe the only reason that we see two invoices instead of just one is because the customer made many purchases and decided to break them out into two invoices?  In that case it would be reasonable to consider the items on both invoices as part of the same shopping session.  However, if the time difference between the two invoices is 10 hours, it might rather be reasonable to consider them as separate shopping sessions (i.e., seeing items on the website during the earlier shopping session could affect purchasing behavior during that session but not during the later sessions). 
 
-If we decide, for example, to define a shopping session for a customer as all the shopping that the customer did on the the website within one day, then a shopping session can be uniquely identified by CustomerID and InvoiceDate.  In that case availability of CustomerID is crucial.  However, if we decide to use invoices as proxies for shopping sessions, then we need only a unique invoice number (InvoiceNo) and do not need CustomerID.  
+If we decide, for example, to define a shopping session for a customer as all the shopping that the customer did on the the website within one day, then a shopping session can be uniquely identified by CustomerID and Date.  In that case availability of CustomerID is crucial.  However, if we decide to use invoices as proxies for shopping sessions, then we need only a unique invoice number (InvoiceNo) and do not need CustomerID.  
 
 Let's understand better the difference between CustomerID and InvoiceNo. The code below outputs the number of unique values of CustomerID, InvoiceNo, and an ID variable that we defined earlier by concatenating CustomerID and Date (i.e., the date of the invoice).  
 
@@ -261,7 +258,7 @@ length(unique(items$InvoiceNo[!is.na(items$CustomerID)]))
 length(unique(items$ID[!is.na(items$CustomerID)]))
 ```
 
-It appears that we have 4336 unique CustomerIDs, 18416 unique values for InvoiceNo (when CustomerID is not missing) and 16689 unique IDs (, also when CustomerID is not missing).  We can see that the number of unique CustomerIDs is substantially lower than the number of unique values for InvoiceNo and ID.  This could be a result of cusomters making purchases on multiple dates. Hence, a few customers can generate a large number of unique invoices as well as a large number of unique IDs (because ID is defined as a CustomerID/InvoiceDate combination).
+It appears that we have 4336 unique CustomerIDs, 18416 unique values for InvoiceNo (when CustomerID is not missing) and 16689 unique IDs (, also when CustomerID is not missing).  We can see that the number of unique CustomerIDs is substantially lower than the number of unique values for InvoiceNo and ID.  This could be a result of cusomters making purchases on multiple dates. Hence, a few customers can generate a large number of unique invoices as well as a large number of unique IDs (because ID is defined as a CustomerID/Date combination).
 
 In that case, purchases by the same customer will have the same cutomer ID but different invoice numbers.  Let's check if there are customers who made purchases on different days and plot the number of customers as a function of the number of days on which they made purchases:
 
@@ -271,7 +268,7 @@ temp = as.data.frame(by_customerID)     # convert vector to dateframe
 temp$customerID = rownames(temp)        # convert rownmaes (customer ID) to a variable
 by_no_days_customer = tapply(temp$customerID, temp$by_customerID, FUN = function(x) length(x))
 
-barplot(by_no_days_customer, main = "Count of Customers by Number of Days\non Which They Made Purchases"
+barplot(by_no_days_customer, main = "Figure 1. Count of Customers by Number of Days\non Which They Made Purchases"
      , ylab = "Number of Customers", xlab = "Number of Days with Purchases"
      , xlim = c(0.75, 20), ylim = c(0, 1600)
      , frame.plot=FALSE, cex.main=1.5, cex.lab = .8, xaxt="n", yaxt="n", col="blue", pch = 20, type = "o")
@@ -283,7 +280,6 @@ box(which = "plot", bty = "l", lwd=2)
 The bar chart generated by the code above is shown below:
 
 ![](https://github.com/eagronin/market-basket-prepare/blob/master/figure-1.png?raw=true)
-
 
 The chart shows that, while many customers made purchases on one day only, a large number of customers indeed shopped on multiple days over approximatley one year period over which data are available.
 
@@ -297,7 +293,7 @@ temp$InvoiceNo = rownames(temp)        # convert rownmaes (InvoiceNo) to a varia
 by_no_days_invoice = tapply(temp$InvoiceNo, temp$by_InvoiceNo, FUN = function(x) length(x))
 ```
 
-How many invoices are there per ID (i.e., CustomerId/InvoiceDate) group? How many IDs are there with only one invoice? with 2 invoices? etc.  The code below plots the count of IDs as a function of the number of invoices issued on the same day:
+How many invoices are there per ID (i.e., CustomerId/Date) group? How many IDs are there with only one invoice? with 2 invoices? etc.  The code below plots the count of IDs as a function of the number of invoices issued on the same day:
 
 ```R
 invoices_per_ID = with(items[!is.na(items$CustomerID),], tapply(InvoiceNo, ID, FUN = function(x) length(unique(x))))
@@ -307,7 +303,7 @@ temp$ID = rownames(temp)        # convert rownmaes (customer ID) to a variable
 items = merge(items, temp, by = "ID", all.x = TRUE)
 IDs_per_numOfInvoices = tapply(temp$ID, temp$invoices_per_ID, FUN = function(x) length(x))
 
-barplot(IDs_per_numOfInvoices, main = "Count of IDs (CustomerID/InvoiceDate Combinations)\nby Number of Invoices Issued on the Same Day"
+barplot(IDs_per_numOfInvoices, main = "Figure 2. Count of IDs by Number of Invoices\nIssued on the Same Day"
         , ylab = "Number of IDs", xlab = "Number of Invoices Issued on the Same Day to a Customer"
         , xlim = c(0.2, 5), ylim = c(0, 16000)
         , frame.plot=FALSE, cex.main=1.5, cex.lab = .8, xaxt="n", yaxt="n", col="blue", pch = 20, type = "o")
@@ -430,7 +426,7 @@ Time of purchase	 | 	13.01	 | 	14.15	 | 	-1.14	 | 	-16.27	 | 	2.20E-16
 
 It appears that the groups with and w/o CustomerIDs are statistically significantly different from one another along each dimension that we tested. Invoices in the group w/o CustomerIDs have substantially longer lists of items with larger amounts spent per invoice and are issued at a later time during the day.  Therefore, simply removing samples with missing CustomerID from the data may introduce bias into our analysis. 
 
-However, if InvoiceNo matches CustomerID closely, then we can use InvoiceNo when CustomerID is missing.  As we have seen earlier, each ID (i.e., CustomerID/Date combination) corresponds to precisely one InvoiceNo on most of the days, even though not on all days. Let's see how many shopping sessions we are going to misclassify as multiple sessions while in fact they would be combined into a smaller number of shopping sessions if CustomerID was available.
+However, if InvoiceNo matches CustomerID closely, then we can use InvoiceNo when CustomerID is missing.  As we have seen in Figure 2, each ID (i.e., CustomerID/Date combination) corresponds to precisely one InvoiceNo on most of the days, even though not on all days. Let's see how many shopping sessions we are going to misclassify as multiple sessions while in fact they would be combined into a smaller number of shopping sessions if CustomerID was available.
 
 First let's check the fraction of CustomerIDs that are missing in the dataset:
 
