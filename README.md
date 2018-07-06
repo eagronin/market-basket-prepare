@@ -431,7 +431,7 @@ However, if InvoiceNo matches CustomerID closely, then we can use InvoiceNo when
 First let's check the fraction of CustomerIDs that are missing in the dataset:
 
 ```R
-sum(is.na(items$CustomerID))/nrow(items)
+sum(is.na(items$CustomerID)) / nrow(items)
 ```
 
 we find that, as we pointed out earlier, 0.249 (or about 25%) of samples have missing CustomerIDs.
@@ -439,7 +439,7 @@ we find that, as we pointed out earlier, 0.249 (or about 25%) of samples have mi
 What is the fraction of IDs (CustomerID/Date combinations) with multiple invoices in the group with non-missing CustomerIDs?  This fraction is calculated as
 
 ```R
-1-IDs_per_numOfInvoices[1]/sum(IDs_per_numOfInvoices)
+1 - IDs_per_numOfInvoices[1] / sum(IDs_per_numOfInvoices)
 ```
 
 and equals to 0.082.  This result means that if we were to replace CustomerID/Date combinations with InvoiceNo in the group with non-missing CustomerID, we would misclassify 8.2% of shopping sessions as separate shopping sessions, while they, in fact, were part of other shopping sessions. Let's assume that this fraction is the same in the group with missing CustomerIDs.  
@@ -447,7 +447,7 @@ and equals to 0.082.  This result means that if we were to replace CustomerID/Da
 Then, if we misclassify 8.2% of shopping sessions in the group with missing CustomerIDs, how many shopping sessions do we misclassify as a fraction of the total number of shopping sessions in the entire dataset?  This can be calculated as product of the fraction of IDs with multiple invoices in the group with missing CustomerIDs (8.2%) and the fraction of samples with missing CustomerIDs (24.9%):
 
 ```R
-(1-IDs_per_numOfInvoices[1]/sum(IDs_per_numOfInvoices)) * (sum(is.na(items$CustomerID))/nrow(items))
+(1 - IDs_per_numOfInvoices[1] / sum(IDs_per_numOfInvoices)) * (sum(is.na(items$CustomerID)) / nrow(items))
 ```
 
 which results in 2.04% of misclassified shopping shopping sessions.  For the subsequent analysis we will prefer to have this small fraction of misclassified shopping sessions over losing 25% of observations and risking bias in the analysis that we discussed above.
