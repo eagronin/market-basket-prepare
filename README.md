@@ -11,7 +11,7 @@ The analysis for this project was performed in R.
 
 ## Data Exploration and Cleaning
 
-We start by generating a few features that we will use in subsequent analysis.  These features inlude the date and time of the invoice ("Date" and "HourMinute", respectively), the total amount spent equal to the product of the item's price and quantity purchased ("AmountSpent"), and an ID variable identifying all purchases by a customer on a particular day ("ID"):
+We start by generating a few features that we will use in subsequent analysis.  These features include the date and time of the invoice ("Date" and "HourMinute", respectively), the total amount spent equal to the product of the item's price and quantity purchased ("AmountSpent"), and an ID variable identifying all purchases by a customer on a particular day ("ID"):
 
 ```R
 items$Date = as.Date(items$InvoiceDate, "%m/%d/%y")               # create date variable from InvoiceDate, which also includes time
@@ -62,7 +62,7 @@ InvoiceNo | StockCode | Description | Country | ID
 579777:   687 | 84879:  1502 | ASSORTED COLOUR BIRD ORNAMENT: 1501 | Netherlands: 2371	
 (Other): 537202 | (Other): 530366 | (Other): 530315 | (Other): 537202 | (Other):   15279	
 
-Futher look at the data reveals that apart from irregularities observed from the summary statistics table above, there are a number of missing or invalid descriptions, such as "?display?", "?missing", "??", "historic computer difference?....se", "POSSIBLE DAMAGES OR LOST?", etc. Also, the highest prices in the data appear against such Description fields as "AMAZON FEE", "Adjust bad debt", "POSTAGE", "DOTCOM POSTAGE", "Manual", i.e., desctiptions of various actions rather than names of items.  Finally, there are a number of cancellations that can be identified using letter "C" in the beginning of InvoiceNo.
+Further look at the data reveals that apart from irregularities observed from the summary statistics table above, there are a number of missing or invalid descriptions, such as "?display?", "?missing", "??", "historic computer difference?....se", "POSSIBLE DAMAGES OR LOST?", etc. Also, the highest prices in the data appear against such Description fields as "AMAZON FEE", "Adjust bad debt", "POSTAGE", "DOTCOM POSTAGE", "Manual", i.e., descriptions of various actions rather than names of items.  Finally, there are a number of cancellations that can be identified using letter "C" in the beginning of InvoiceNo.
 
 Invalid samples should be removed from the data before we run the algorithm to determine associations between customer purchases.  We will deal with these samples first and look into handling missing CustomerIDs after that.
 
@@ -74,7 +74,7 @@ unique(temp$Description)
 temp[temp$Description != "REGENCY CAKESTAND 3 TIER",]
 ```
 
-This code generates the follwoing output:
+This code generates the following output:
 
 ```
 [1] REGENCY CAKESTAND 3 TIER faulty                   damages                 
@@ -95,7 +95,7 @@ unique(temp$Description)
 temp[temp$Description != "ASSORTED COLOUR BIRD ORNAMENT",]
 ```
 
-This code generates the follwoing output:
+This code generates the following output:
 
 ```
 [1] ASSORTED COLOUR BIRD ORNAMENT damaged                      
@@ -106,7 +106,7 @@ This code generates the follwoing output:
 
 We can see that the mismatch resulted from one damaged item that has been returned.
 
-Let's remove all the returned items (i.e., items with negative Quantity) from the data.  From looking further at the data it  appears that there are also a number of items with zero quantity.  Let's remove these observations as well:
+Let's remove all the returned items (i.e., items with negative Quantity) from the data.  From looking further at the data, it  appears that there are also a number of items with zero quantity.  Let's remove these observations as well:
 
 ```R
 nrow(items[items$Quantity <= 0,])   
@@ -213,7 +213,7 @@ items = items[!grepl(x=items$InvoiceNo, pattern ="^C.*"),]
 nrow(items)
 ```
 
-The number of observations remains at `527,944`, which means that all the cancellations were in the subset of items that we have already removed in prior rounds of data cleanining.
+The number of observations remains at `527,944`, which means that all the cancellations were in the subset of items that we have already removed in prior rounds of data cleaning.
 
 Let's output summary statistics again using `summary(items)`:
 
@@ -244,11 +244,11 @@ InvoiceNo	 | 	StockCode	 | 	Description	 | 	Country	 | 	ID
 579777  :   686	 | 	84879  :  1489	 | 	ASSORTED COLOUR BIRD ORNAMENT  :  1489	 | 	Netherlands  :  2322	 | 	
 (Other)  :  523243	 | 	(Other)  :  516693	 | 	(Other)  :  516703	 | 	(Other)  :  14476	 | 	
 
-The summary statistics look reasonable now, except we have not addressed the issue of missing CustomerIDs yet.  This feature is important for defining a shopoing session.  Because our goal is to identify co-occurrence relationships among customers’ purchase activities, it is important to define a timeframe within which such purchase activities should be counted toward a co-occurence relationship.  
+The summary statistics look reasonable now, except we have not addressed the issue of missing CustomerIDs yet.  This feature is important for defining a shopping session.  Because our goal is to identify co-occurrence relationships among customers’ purchase activities, it is important to define a timeframe within which such purchase activities should be counted toward a co-occurrence relationship.  
 
 If we were to analyze customer visits to a local supermarket, it would be intuitive to define a shopping session as one trip to the supermarket.  However, when online shopping is concerned, defining a shopping session is more subtle.  What if a customer has two invoices within the same day?  Should these invoices be considered as two separate shopping sessions?  What if the difference in the time stamps on these invoices is only one minute?  Maybe the only reason that we see two invoices instead of just one is because the customer made many purchases and decided to break them out into two invoices?  In that case it would be reasonable to consider the items on both invoices as parts of the same shopping session.  However, if the time difference between the two invoices is 10 hours, it might rather be reasonable to consider such invoices as separate shopping sessions (i.e., seeing items on the website during the earlier shopping session could affect purchasing behavior during that session but not during the later sessions). 
 
-If we decide, for example, to define a shopping session for a customer as all the shopping that the customer did on the the website within one day, then a shopping session can be uniquely identified by CustomerID and Date.  In that case availability of CustomerID is crucial.  However, if we decide to use invoices as proxies for shopping sessions, then we need only a unique invoice number (InvoiceNo) and do not need CustomerID.  
+If we decide, for example, to define a shopping session for a customer as all the shopping that the customer did on the website within one day, then a shopping session can be uniquely identified by CustomerID and Date.  In that case availability of CustomerID is crucial.  However, if we decide to use invoices as proxies for shopping sessions, then we need only a unique invoice number (InvoiceNo) and do not need CustomerID.  
 
 Let's understand better the difference between CustomerID and InvoiceNo. The code below outputs the number of unique values of CustomerID, InvoiceNo, and an ID variable that we defined earlier by concatenating CustomerID and Date (i.e., the date of the invoice).  
 
@@ -258,9 +258,9 @@ length(unique(items$InvoiceNo[!is.na(items$CustomerID)]))
 length(unique(items$ID[!is.na(items$CustomerID)]))
 ```
 
-Based on the output from running the above code, we have 4,336 unique CustomerIDs, 18,416 unique values for InvoiceNo (when CustomerID is not missing) and 16,689 unique IDs (also when CustomerID is not missing).  We can see that the number of unique CustomerIDs is substantially lower than the number of unique values for InvoiceNo and ID.  This could be a result of cusomters making purchases on multiple dates. Hence, a few customers can generate a large number of unique invoices as well as a large number of unique IDs (because ID is defined as a CustomerID/Date combination).
+Based on the output from running the above code, we have 4,336 unique CustomerIDs, 18,416 unique values for InvoiceNo (when CustomerID is not missing) and 16,689 unique IDs (also when CustomerID is not missing).  We can see that the number of unique CustomerIDs is substantially lower than the number of unique values for InvoiceNo and ID.  This could be a result of customers making purchases on multiple dates. Hence, a few customers can generate a large number of unique invoices as well as a large number of unique IDs (because ID is defined as a CustomerID/Date combination).
 
-In that case, purchases by the same customer will have the same cutomer ID but different invoice numbers.  Let's check if there are customers who made purchases on different days and plot the count of customers as a function of the number of days on which they made purchases:
+In that case, purchases by the same customer will have the same customer ID but different invoice numbers.  Let's check if there are customers who made purchases on different days and plot the count of customers as a function of the number of days on which they made purchases:
 
 ```R
 by_customerID = tapply(items$Date, items$CustomerID, FUN = function(x) length(unique(x)))   # group unique dates by customer ID
@@ -281,7 +281,7 @@ The bar chart generated by the code above is shown below:
 
 ![](https://github.com/eagronin/market-basket-prepare/blob/master/figure-1.png?raw=true)
 
-The chart shows that, while many customers made purchases on one day only, a large number of customers indeed shopped on multiple days over approximatley one year period over which the data are available.
+The chart shows that, while many customers made purchases on one day only, a large number of customers indeed shopped on multiple days over approximately one year period over which the data are available.
 
 We now turn to the InvoiceNo attribute.  InvoiceNo values are unique as reported on the official website from which the data were downloaded, and as the code below verifies by finding that there are no invoices with the same InvoiceNo issued on different days:
 
@@ -332,7 +332,7 @@ wide$Diff = abs(wide$DateTime.2 - wide$DateTime.1)/60     # convert from seconds
 median(wide$Diff, na.rm = TRUE)
 ```
 
-It appears that the median time difference between two invoices issued on the same date is 2 minutes.  This amount of time is too short to consider the two invoices as proxies for two separate shopping sessions.  Rather, it is possible that customers who purchase more items tend to break out their purchases into multiple invoices.  In order to test this hypothesis we comare the average number of distinct StockCodes per invoice between the group with one invoice per day and the group with multiple invoices per day.  If this hypothesis is true, then it would make sense to consider multiple invoices issued on the same day for the same customer as parts of the same shopping session. In that case, using CustomerID is preferrable to using InoiceNo. 
+It appears that the median time difference between two invoices issued on the same date is 2 minutes.  This amount of time is too short to consider the two invoices as proxies for two separate shopping sessions.  Rather, it is possible that customers who purchase more items tend to break out their purchases into multiple invoices.  In order to test this hypothesis, we compare the average number of distinct StockCodes per invoice between the group with one invoice per day and the group with multiple invoices per day.  If this hypothesis is true, then it would make sense to consider multiple invoices issued on the same day for the same customer as parts of the same shopping session. In that case, using CustomerID is preferable to using InvoiceNo. 
 
 The code below performs a t-test to check the validity of this hypothesis:
 
@@ -367,7 +367,7 @@ mean of x mean of y
 ```
 
 
-This, in turn, implies that we should use CustomerID for identifying shopping sessions.  Would we have an issue if we removed the samples with missing customer IDs?  Let's compare the samples with and without customer ID.  If the samples with CustomerID are representative of the samples without CustomerID, then removing samples without CutomerID will not bias the results. However, if there are systemic differences between the two groups, then simply removing samples without CutomerID may bias the results.  This would mean that the co-occurrence relationships among customers’ purchase activities that we will identify using the samples with CustomerID are going to generate incorrect recommendations for the customers represented by the samples without CustomerID.
+This, in turn, implies that we should use CustomerID for identifying shopping sessions.  Would we have an issue if we removed the samples with missing customer IDs?  Let's compare the samples with and without customer ID.  If the samples with CustomerID are representative of the samples without CustomerID, then removing samples without CustomerID will not bias the results. However, if there are systemic differences between the two groups, then simply removing samples without CustomerID may bias the results.  This would mean that the co-occurrence relationships among customers’ purchase activities that we will identify using the samples with CustomerID are going to generate incorrect recommendations for the customers represented by the samples without CustomerID.
 
 We first split the dataset into two groups: with CustomerID available and with CustomerID missing:
 
@@ -394,7 +394,7 @@ spent_no_id = tapply(no_cust_id$AmountSpent, no_cust_id$InvoiceNo, FUN = sum)
 t.test(spent_with_id, spent_no_id)
 ```
 
-  3. Select the time of purchase per invoice for each group (we calculate the most frequent occurance of time across items that belong to the same invoice to prevent typos affecting results, as invoice time should be the same for all items contained in it), and compare the means using a t-test:
+  3. Select the time of purchase per invoice for each group (we calculate the most frequent occurrence of time across items that belong to the same invoice to prevent typos affecting results, as invoice time should be the same for all items contained in it), and compare the means using a t-test:
 
 ```R
 hour_with_id = tapply(
@@ -456,7 +456,7 @@ Let's assume that this fraction is the same in the group with missing CustomerID
 (1 - IDs_per_numOfInvoices[1] / sum(IDs_per_numOfInvoices)) * (sum(is.na(items$CustomerID)) / nrow(items))
 ```
 
-which results in 2.04% of misclassified shopping shopping sessions.  For the subsequent analysis we will prefer to have this small fraction of misclassified shopping sessions over losing 25% of observations and risking bias in the analysis that we discussed above.
+which results in 2.04% of misclassified shopping sessions.  For the subsequent analysis we will prefer to have this small fraction of misclassified shopping sessions over losing 25% of observations and risking bias in the analysis that we discussed above.
 
 The code below replaces the missing IDs using InvoiceNo / Date combinations:
 
