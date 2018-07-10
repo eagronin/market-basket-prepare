@@ -414,14 +414,14 @@ hour_no_id = tapply(
 t.test(hour_with_id, hour_no_id)
 ```
 
-The results of the above tests are summarized below:
+The results of the above tests are summarized in Table 3:
 
 **Table 3**
 
-Metric of Interest  per Invoice	 | 	Mean (CustomerID is Available)	 | 	Meand (CustomerID is Missing)	 | 	Difference	 | 	t-statistic	 | 	p-value
+Metric of Interest	 | 	Mean (CustomerID is Available)	 | 	Meand (CustomerID is Missing)	 | 	Difference	 | 	t-statistic	 | 	p-value
 :---	 | 	---:	 | 	---:	 | 	---:	 | 	---:	 | 	---:
-Number of distinct StockCodes	 | 	20.99	 | 	95.41	 | 	-74.43	 | 	-19.93	 | 	2.20E-16
-Amount spent	 | 	476.10	 | 	1100.83	 | 	-624.73	 | 	-8.81	 | 	2.20E-16
+Number of distinct StockCodes per Invoice | 	20.99	 | 	95.41	 | 	-74.43	 | 	-19.93	 | 	2.20E-16
+Amount spent per Invoice | 	476.10	 | 	1100.83	 | 	-624.73	 | 	-8.81	 | 	2.20E-16
 Time of purchase	 | 	13.01	 | 	14.15	 | 	-1.14	 | 	-16.27	 | 	2.20E-16
 
 It appears that the groups with and w/o CustomerIDs are statistically significantly different from one another along each dimension that we tested. Invoices in the group w/o CustomerIDs have substantially longer lists of items with larger amounts spent per invoice and are issued at a later time during the day.  Therefore, simply removing samples with missing CustomerID from the data may introduce bias into our analysis. 
